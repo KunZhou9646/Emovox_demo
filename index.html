@@ -1,0 +1,3134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta name="google-site-verification" content="ftFOlJETX-2KNjaPh8W6s8lhigItRuu9fOmjHZZ0nY0" />
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <title>Limited Data Emotional Voice Conversion Leveraging Text-to-Speech: Two-stage Sequence-to-Sequence Training</title>
+</head>
+<style type="text/css">
+  table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  audio {
+    width: 100%;
+  }
+
+  thead>tr>th:first-child {
+    width: 96px;
+  }
+
+  @media (max-width: 767px) {
+    .big-screen {
+      display: none;
+    }
+  }
+
+  @media (min-width: 767px) {
+    .small-screen {
+      display: none;
+    }
+  }
+</style>
+
+<body>
+  <header class="header">
+    <div class="jumbotron bg-secondary text-center">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <h1><a class="text-light">Demo Page for "Emotion Intensity and its Control for Emotional Voice Conversion"</h1><br>
+             <font size=5><span style="color:#FFFFFF"> Kun Zhou<sup>1</sup>, Berrak Sisman<sup>2</sup>, Rajib Rana<sup>3</sup>, Bj&oumlrn W. Shuller<sup>4</sup>, Haizhou Li<sup>1</sup>       </br>
+             <font size=3><span style="color:#000000"> zhoukun@u.nus.edu &nbsp berraksisman@u.nus.edu &nbsp Rajib.Rana@usq.edu.au &nbsp bjoern.schuller@imperial.ac.uk &nbsp haizhou.li@nus.edu.sg
+             </font><font size=4> <br> <br> <sup>1</sup>  Dept. of Electrical and Computer Engineering, National University of Singapore, Singapore <br> <sup>2</sup>  Information Systems Technology and Design, Singapore University of Technology and Design, Singapore  <br> <sup>3</sup>  University of Southern Queensland, Australia  <br> <sup>4</sup>  Imperial College London, U.K.  <br> </font>  </a>  
+            <p>
+              <div class="row">
+              </div>
+            </p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="row" id="result">
+        <div class="col-md-12">
+                    <h2>-------------------------------->   Abstract   <---------------------------------</h2>
+          <br />
+       <font size="4">
+                    Emotional voice conversion (EVC) seeks to convert the emotional state of an utterance while preserving the linguistic content and speaker identity. Typically, emotions are treated as discrete categories, and EVC is implemented as the mapping between the categories, unable to handle anything between them. In this paper, we would like to study a way to characterize and to explicitly control the intensity of emotion. We propose to disentangle the speaker style from linguistic content, and encode the speaker style into a style embedding in a continuous space, that forms the prototype of emotion embedding. We further learn the actual emotion encoder from emotion-labelled database, and study the use of relative attributes to represent fine-grained emotion intensity. To ensure the emotional intelligibility, we incorporate both emotional classification loss and emotion embedding similarity loss into the training of EVC network. The proposed network allows for controlling the fine-grained emotion intensity in the output speech  as desired. We report the performance of the proposed framework in terms of spectrum, prosody, and duration conversion quality on ESD database. Through both objective and subjective evaluations, we validate the effectiveness of the proposed network.  
+
+                  <div class="big-screen">
+                    <br /><br />
+
+          <h2>---------------------------->   Model Architecture   <-----------------------</h2>
+          <br />
+                    <img src="./stage3_update.png"  width="1050" height="600" / > <p>
+                      <figcaption style="terx-align:center;"></font><font size=3> 
+                       Figure 1. Overall framework of Emovox at emotion training stage. A learned relative ranking function automatically predicts the emotion intensity of the input emotional speech. A pre-trained speech emotion recognition (SER) model serves as the emotion supervision to improve the emotional intelligibility in output speech.</font>
+                      </figcaption><br>
+                    The codes of this paper are publicly available <a href="https://github.com/KunZhou9646/seq2seq-EVC">here</a>.<br><p>
+                   
+                  <div class="big-screen">
+                    <br /><br />
+                     <h2>----------------------------->   Speech Samples  <---------------------------</h2>
+
+                     <table class="table">
+                      <thead>
+                            <th colspan=6 style="color:blue;"><h4>(A) Emotion Intensity Evaluation</h4></th>
+                        <tr>
+             
+                         
+                        </tr>
+                      <tbody>
+                                
+                                
+                                <tr>
+                                    <th></th>
+                                    <th style="text-align:center;font-size:80%">   Source <p>(Neutral)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.1 (Most Weak)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.3 (Less Weak)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.6 (Less Strong)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.9 (Most Strong)</th>
+
+                                </tr>
+                              <tr>                             
+                                   <th colspan=6 style="font-size:80%"><h8>Neutral-to-Angry (converting neutral to angry with different intensities):</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.3/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.6/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000009.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_09.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.3/Mel_09.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.6/Mel_09.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_09.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                    <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000012.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_12.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.3/Mel_12.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.6/Mel_12.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_12.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                    <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000017.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.3/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.6/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                    <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.3/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.6/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                                                      <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.3/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.6/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>                             
+                                   <th colspan=6 style="font-size:80%"><h8>Neutral-to-Sad (converting neutral to sad with different intensities):</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000002.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.3/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.3/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000009.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_09.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.3/Mel_09.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_09.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_09.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.3/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000017.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_17.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.3/Mel_17.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_17.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_17.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.3/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                   <tr>                             
+                                   <th colspan=6 style="font-size:80%"><h8>Neutral-to-Happy (converting neutral to happy with different intensities):</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.3/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.6/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000009.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.3/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.6/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000012.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_12.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.3/Mel_12.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.6/Mel_12.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_12.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.3/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.6/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.3/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.6/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.3/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.6/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                
+                                                                 
+                      
+
+                      </tbody>
+                       
+                   </table>
+                    
+
+
+
+                     <br /><br />
+                    <!--  Speech Quality Evaluation -->
+                     </thead> <b>Compare with other intensity control methods</b><p>
+
+                    <h6><b>Experimental Setup:<b></h6>
+                  
+                    <h6>(1) <b>Emovox w/ Scaling Factor</b>: where the emotion embedding is multiplied by a scaling factor [1]. </h6>
+                    <h6>(2) <b>Emovox w/ Attention Weights</b>: where the attention weight vector obtained from a pre-trained SER is used to represent the intensity [2]. </h6>
+                    <h6>(3) <b>Emovox w/ Relative Attributes </b>: our proposed method with relative attributes as described in Figure 1. </h6>
+
+
+
+  <table class="table">
+                      <thead>
+                            
+                        <tr>
+             
+                         <th colspan=6><h5><b>Neutral-to-Angry:</b></h5></th>
+                        </tr>
+                      <tbody>
+                                
+                                
+                                <tr>
+                                    <th></th>
+                                    <th style="text-align:center;font-size:80%">   </th>
+                                    <th style="text-align:center;font-size:80%">   Source <p>(Neutral)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.1 <p>(Weak)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.5 (Medium)</th>
+                                    <th style="text-align:center;font-size:80%">   Intensity = 0.9 (Strong)</th>
+
+                                </tr>
+                                 <thead>
+                               <tr><th colspan=6><h5><b>Neutral-to-Angry:</b></h5></th></tr><tr></tr>
+                                  
+                                                     <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #1</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/angry/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/angry/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/angry/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                </tr>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/angry/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/angry/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/angry/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.5/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                
+                                                     <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #2</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/angry/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/angry/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/angry/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/angry/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/angry/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/angry/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.5/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_18.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>                    
+                                        
+                                         <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #3</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/angry/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/angry/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/angry/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/angry/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/angry/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/angry/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.5/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_19.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>   
+                                   <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #4</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.1/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.5/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/angry/0.9/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>  
+                                </tr>
+
+                                  <table class="table">
+                      <thead>
+                            <th colspan=6><h5><b>Neutral-to-Happy:</b></h5></th>
+                        <tr>
+             
+                         
+                        </tr>
+                      <tbody>
+                                
+
+                                   <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #1</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/happy/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/happy/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/happy/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/happy/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/happy/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/happy/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.5/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>     
+
+                                                                     <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #2</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000009.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/happy/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/happy/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/happy/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000009.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/happy/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/happy/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/happy/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000009.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.5/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_09.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>  
+
+                                                                     <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #3</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/happy/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/happy/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/happy/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/happy/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/happy/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/happy/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.5/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_19.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>                                                        
+    
+                                       <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #4</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/happy/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/happy/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/happy/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/happy/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/happy/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/happy/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.1/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.5/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/happy/0.9/Mel_20.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>    
+
+
+                                   <table class="table">
+                      <thead>
+                            <th colspan=6><h5><b>Neutral-to-Sad:</b></h5></th>
+                        <tr>
+             
+                         
+                        </tr>
+                      <tbody>
+                                
+
+                                   <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #1</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/sad/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/sad/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/sad/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/sad/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/sad/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/sad/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                                                    <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #2</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/sad/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/sad/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/sad/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/sad/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/sad/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/sad/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_10.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                                                    <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #3</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/sad/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/sad/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/sad/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/sad/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/sad/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/sad/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_07.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                                                    <!-- single sentence -->
+                                <tr>
+                                  <td>
+                                    <h6>Sample #4</h6>
+                                  </td>
+                                                                    <td>
+                                    
+                                  </td>
+                                                                    <td>
+                                  
+                                  </td>
+                                                                    <td>
+                                 
+                                  </td>
+                                                                    <td>
+           
+                                  </td>
+                                                                    <td>
+       
+                                  </td>
+                                  </tr>
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(1) Emovox w/ <p>Scaling Factor</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000002.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.1/sad/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.5/sad/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/scaling/0.9/sad/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(2) Emovox w/ <p>Attention Weights</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000002.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.1/sad/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.5/sad/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/intensity_baseline/attention/0.9/sad/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                     
+                                      <h6>(3) Emovox w/ <p>Relative Attributes</h6>
+                                 
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000002.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.1/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.6/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/emovox_intensity/sad/0.9/Mel_02.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+  
+
+                      </tbody>
+                       
+
+                    </table>
+
+
+                      <br /><br />
+                    <!--  Speech Quality Evaluation -->
+
+                     <p><h4 style="color:blue">(B) Emotion Similarity Evaluation</h4></p>
+
+                    <h6><b>Experimental Setup:<b></h6>
+                  
+                    <h6>(1) <b>CycleGAN-EVC [3] (baseline)</b>: CycleGAN-based emotional voice conversion with WORLD vocoder [4], where fundamental frequency (F0) is analyzed with continuous wavelet transform;. </h6>
+                    <h6>(2) <b>StarGAN-EVC [5] (baseline)</b>: StarGAN-based emotional voice conversion with WORLD vocoder [4]. </h6>
+                    <h6>(3) <b>Seq2Seq-EVC [6] (baseline)</b>: sequence-to-sequence emotional voice conversion with Parallel WaveGAN vocoder [7]. </h6>
+                    <h6>(3) <b>Emovox (proposed)</b>: Our proposed sequence-to-sequence emotional voice conversion framework with Parallel WaveGAN [7], as described in Figure 1. </h6>
+
+
+
+
+ <table class="table">
+                      <thead>
+                        <tr>
+             
+                         
+                        </tr>
+                      <tbody>
+                                
+                                
+                                <tr>
+                                    <th></th>
+                                    <th style="text-align:center;font-size:70%">   Source</th>
+                                    <th style="text-align:center;font-size:70%">   CycleGAN-EVC</th>
+                                    <th style="text-align:center;font-size:70%">   StarGAN-EVC</th>
+                                    <th style="text-align:center;font-size:70%">   Seq2Seq-EVC</th>
+                                    <th style="text-align:center;font-size:70%">   Emovox (proposed)</th>
+                                    <th style="text-align:center;font-size:70%">   Target</th>
+
+                                </tr>
+                              <tr>                             
+                                   <th colspan=7 style="font-size:80%"><h8>Neutral-to-Angry:</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000012.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/angry/0013_000012.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/angry/Neu_0013_000012-vcto-Ang.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/angry/Mel_12.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/angry/Mel_12.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/angry/0013_000362.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000017.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/angry/0013_000017.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/angry/Neu_0013_000017-vcto-Ang.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/angry/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/angry/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/angry/0013_000367.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/angry/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/angry/Neu_0013_000020-vcto-Ang.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/angry/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/angry/0013_000370.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                   <tr>                             
+                                   <th colspan=7 style="font-size:80%"><h8>Neutral-to-Sad:</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/sad/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/sad/Neu_0013_000018-vcto-Sad.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/sad/Mel_18.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/sad/Mel_18.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/sad/0013_001068.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000016.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/sad/0013_000016.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/sad/Neu_0013_000016-vcto-Sad.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/sad/Mel_16.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/sad/Mel_16.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/sad/0013_001066.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000013.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/sad/0013_000013.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/sad/Neu_0013_000013-vcto-Sad.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/sad/Mel_13.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/sad/Mel_13.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/sad/0013_001063.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <tr>                             
+                                   <th colspan=7 style="font-size:80%"><h8>Neutral-to-Happy:</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000002.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/happy/0013_000002.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/happy/Neu_0013_000002-vcto-Hap.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/happy/Mel_02.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/happy/Mel_02.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/happy/0013_000702.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                   <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000003.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/happy/0013_000003.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/happy/Neu_0013_000003-vcto-Hap.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/happy/Mel_03.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/happy/Mel_03.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/happy/0013_000703.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                   <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000004.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/cyclegan/happy/0013_000004.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/stargan/happy/Neu_0013_000004-vcto-Hap.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/seq2seq/happy/Mel_04.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/emovox/happy/Mel_04.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                                      <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/target/happy/0013_000704.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+
+
+                                                        </tbody>
+                       
+
+                    </table>
+
+
+
+                     <p><h4 style="color:blue">(C) Ablation Studies</h4></p>
+
+                    <h6><b>Experimental Setup:<b></h6>
+                  
+                    <h6>(1) <b>Emovox w/o Intensity</b>: Proposed Emovox without the intensity control module; </h6>
+                    <h6>(2) <b>Emovox w/o Intensity and L<sub>cls</b>:  Proposed Emovox without the intensity control module and emotion classification loss L<sub>cls;</h6>
+                    <h6>(3) <b>Emovox w/o Intensity and L<sub>sim</b>:  Proposed Emovox without the intensity control module and emotion embedding similarity loss L<sub>sim;</h6>
+                    <h6>(3) <b>Emovox w/o Intensity and L<sub>cls</sub> and L<sub>sim</sub></b>: Proposed Emovox without the intensity control module, emotion classification loss L<sub>cls</sub> and emotion embedding similarity loss L<sub>sim; </h6>
+<table class="table">
+                      <thead>
+                        <tr>
+             
+                         
+                        </tr>
+                      <tbody>
+                                
+                                
+                                <tr>
+                                    <th></th>
+                                    <th style="text-align:center;font-size:70%">   Source</th>
+                                    <th style="text-align:center;font-size:70%">   Emovox w/o Intensity and L<sub>cls</sub> and L<sub>sim</sub></b></th>
+                                    <th style="text-align:center;font-size:70%">   Emovox w/o Intensity and L<sub>sim</b></th>
+                                    <th style="text-align:center;font-size:70%">   Emovox w/o Intensity and L<sub>cls</th>
+                                    <th style="text-align:center;font-size:70%">   Emovox w/o Intensity</th>
+                                   
+
+                                </tr>
+                              <tr>                             
+                                   <th colspan=6 style="font-size:80%"><h8>Neutral-to-Angry:</h8></th>
+                               </tr>
+                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000010.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/IS/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose-cls/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose-sim/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose/Mel_10.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000017.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/IS/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose-cls/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose-sim/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose/Mel_17.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/IS/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose-cls/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose-sim/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/angry/propose/Mel_20.mel.npy_ref_Angry_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                              <tr>                             
+                                   <th colspan=6 style="font-size:80%"><h8>Neutral-to-Sad:</h8></th>
+                               </tr>
+                                                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000008.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/IS/Mel_08.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose-cls/Mel_08.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose-sim/Mel_08.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose/Mel_08.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                               <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000019.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/IS/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose-cls/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose-sim/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose/Mel_19.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                                               <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000020.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/IS/Mel_20.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose-cls/Mel_20.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose-sim/Mel_20.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/sad/propose/Mel_20.mel.npy_ref_Sad_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                <tr>                             
+                                   <th colspan=6 style="font-size:80%"><h8>Neutral-to-Happy:</h8></th>
+                               </tr>
+   
+                                                                <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000007.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/IS/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose-cls/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose-sim/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose/Mel_07.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+
+                                  <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000017.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/IS/Mel_17.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose-cls/Mel_17.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose-sim/Mel_17.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose/Mel_17.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <!-- single sentence -->
+
+                                <tr>
+                                  <th scope="row">    </th>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/baseline/source/0013_000018.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                
+                                  </td>
+                                  <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/IS/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose-cls/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose-sim/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+                                                                    <td>
+                                    <audio controls>
+                                      <source src="./demo/ablation/happy/propose/Mel_18.mel.npy_ref_Happy_VC.npy_gen.wav" type="audio/wav" />
+                                      Your browser does not support the audio element.
+                                    </audio>
+                                  </td>
+   
+   
+                                                           </tbody>
+                       
+
+                    </table>
+
+<h4>References:</h4>
+<h6>
+[1] H.  Choi  and  M.  Hahn,  “Sequence-to-sequence  emotional  voice conversion with strength control,” IEEE Access, vol. 9, pp. 42 674–42 687, 2021 <p>
+
+[2] B. Schnell  and  P.  N.  Garner,  “Improving  emotional  tts  with  anemotion intensity input from unsupervised extraction,” in Proc.11th ISCA Speech Synthesis Workshop (SSW 11), pp. 60–65 <p>
+
+[3] K.  Zhou,  B.  Sisman,  and  H.  Li,  “Transforming  Spectrum  and Prosody for Emotional Voice Conversion with Non-Parallel Training  Data,”  in Proc.  Odyssey  2020  The  Speaker  and  Language Recognition Workshop, 2020, pp. 230–237<p>
+
+[4] M. Morise, F. Yokomori, and K. Ozawa, “World: a vocoder-based high-quality speech synthesis system for real-time applications,” IEICE TRANSACTIONS on Information and Systems, vol. 99, no. 7,pp. 1877–1884, 2016<p>
+
+[5] G.  Rizos,  A.  Baird,  M.  Elliott,  and  B.  Schuller,  “Stargan  for emotional  speech  conversion:   Validated  by  data  augmentation of end-to-end emotion recognition,” in ICASSP 2020-2020 IEEE International Conference on Acoustics,  Speech and Signal Processing (ICASSP).    IEEE, 2020, pp. 3502–3506<p>
+
+[6] R.  Yamamoto,  E.  Song,  and  J.-M.  Kim,  “Parallel  wavegan:  A fast waveform generation model based on generative adversarial networks  with  multi-resolution  spectrogram,”  in ICASSP  2020-2020 IEEE International Conference on Acoustics, Speech and SignalProcessing (ICASSP).    IEEE, 2020, pp. 6199–6203 <p>
+
+[7] K.  Zhou,  B.  Sisman,  and  H.  Li,  “Limited  Data  Emotional  Voice Conversion  Leveraging  Text-to-Speech:  Two-Stage  Sequence-to-Sequence Training,” in Proc. Interspeech 2021, 2021, pp. 811–815
+</h6>
+
+
+
+
+                  </div>
+                 
+        </div>
+      </div>
+      <hr>
+      <div class="row" id="ref">
+        <div class="col">
+          <!--<h2>References</h2>
+          
+         -->
+        </div>
+      </div>
+      <hr>
+      <!-- <div class="row" id="contact">
+          <div class="col">
+            <h2>Contact</h2>
+            <div></div>
+          </div>
+        </div> -->
+    </div>
+  </main>
+  <footer class="bg-secondary text-light mt-4 pt-3 pb-2 ">
+    <div class="container">
+      <p class="text-center">
+        
+      </p>
+    </div>
+  </footer>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
